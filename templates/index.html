@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BubbleCloud</title>
+    <style>
+        body.light-mode {
+            background-color: #ffffff;
+            color: #000000;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        body.dark-mode {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        h1 {
+            text-align: center;
+        }
+        .container {
+            max-width: 650px;
+            margin: 0 auto;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+        }
+        .container.light-mode {
+            background-color: #f4f4f4;
+            color: #000000;
+        }
+        .container.dark-mode {
+            background-color: #1e1e1e;
+            color: #ffffff;
+        }
+        .message {
+            color: #66ff66;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        form {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        input[type="file"] {
+            margin-bottom: 10px;
+            padding: 5px;
+            border-radius: 5px;
+        }
+        input[type="file"].light-mode {
+            background-color: #eeeeee;
+            color: #000000;
+        }
+        input[type="file"].dark-mode {
+            background-color: #333;
+            color: #ffffff;
+        }
+        button {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 188, 212, 0.3);
+        }
+        button:hover {
+            background-color: #008c9e;
+        }
+        button.light-mode {
+            background-color: #00bcd4;
+            color: #ffffff;
+        }
+        button.dark-mode {
+            background-color: #00bcd4;
+            color: #ffffff;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #333;
+        }
+        a {
+            text-decoration: none;
+        }
+        a.light-mode {
+            color: black;
+        }
+        a.dark-mode {
+            color: white;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .delete-button {
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(255, 77, 77, 0.3);
+        }
+        .delete-button:hover {
+            background-color: #e60000;
+        }
+        .delete-button.light-mode {
+            background-color: #ff4d4d;
+            color: #ffffff;
+        }
+        .delete-button.dark-mode {
+            background-color: #ff4d4d;
+            color: #ffffff;
+        }
+        #footer {
+            position: fixed;
+            bottom: 1px;
+        }
+        /* Toggle button styling */
+        .toggle-button {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            position: fixed;
+            right: 6px;
+        }
+    </style>
+</head>
+<body class="dark-mode">
+    <div class="toggle-button">
+        <button id="mode-toggle" class="dark-mode">Light Mode</button>
+    </div>
+    <div class="container dark-mode">
+        <h1>BubbleCloud</h1>
+
+        <!-- Dark Mode / Light Mode Toggle -->
+
+        <!-- Bericht na upload of verwijdering -->
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="message">
+                    {% for message in messages %}
+                        <p>{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Formulier om bestanden te uploaden -->
+        <form action="/upload" method="POST" enctype="multipart/form-data">
+            <input type="file" name="file" class="dark-mode">
+            <button type="submit" class="dark-mode">Upload</button>
+        </form>
+
+        <h2>Files:</h2>
+        <ul>
+            <!-- Toon alle bestanden die zijn geüpload -->
+            {% for file in files %}
+                <li>
+                    <a href="/files/{{ file }}" class="dark-mode">{{ file }}</a>
+                    <form action="/delete/{{ file }}" method="POST" style="display:inline;">
+                        <button class="delete-button dark-mode" type="submit">Delete</button>
+                    </form>
+                </li>
+            {% else %}
+                <li>No Files Found</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div id="footer">
+        <p><a href="" class="dark-mode">Github</a></p>
+    </div>
+
+    <script>
+        const toggleButton = document.getElementById('mode-toggle');
+        const body = document.body;
+        const container = document.querySelector('.container');
+        const inputs = document.querySelectorAll('input');
+        const buttons = document.querySelectorAll('button');
+        const links = document.querySelectorAll('a');
+        
+        toggleButton.addEventListener('click', () => {
+            // Toggle body class for light/dark mode
+            body.classList.toggle('light-mode');
+            body.classList.toggle('dark-mode');
+            
+            // Toggle container class for light/dark mode
+            container.classList.toggle('light-mode');
+            container.classList.toggle('dark-mode');
+            
+            // Toggle input, button, and link classes for light/dark mode
+            inputs.forEach(input => {
+                input.classList.toggle('light-mode');
+                input.classList.toggle('dark-mode');
+            });
+
+            buttons.forEach(button => {
+                button.classList.toggle('light-mode');
+                button.classList.toggle('dark-mode');
+            });
+
+            links.forEach(link => {
+                link.classList.toggle('light-mode');
+                link.classList.toggle('dark-mode');
+            });
+
+            // Change button text based on current mode
+            if (body.classList.contains('light-mode')) {
+                toggleButton.textContent = 'Dark Mode';
+            } else {
+                toggleButton.textContent = 'Light Mode';
+            }
+        });
+    </script>
+</body>
+</html>
