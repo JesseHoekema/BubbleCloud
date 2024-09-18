@@ -1,5 +1,9 @@
 # BubbleCloud
 
+Create your own hosted simple storage! Just run it in docker or on your own terminal.
+If you want to add some features you can add them freely with this open-source storage place!
+Found a bug? open a issue in the issues tab
+
 ## How To Run The Test Version?
 **you need to clone the project first!**
 
