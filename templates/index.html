@@ -6,6 +6,11 @@
     <title>BubbleCloud</title>
     <link rel="shortcut icon" href="logo.png" type="image/x-icon">
     <style>
+        * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
         body.light-mode {
             background-color: #ffffff;
             color: #000000;
@@ -125,15 +130,95 @@
             justify-content: center;
             position: fixed;
             right: 6px;
+            margin-top: 15px;
         }
+        header {
+    position: relative;
+}
+
+.menu-bar {
+    background-color: #4CAF50; /* Groene kleur */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    height: 50px;
+    color: white;
+}
+
+
+.hamburger {
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.menu-title {
+    font-size: 22px;
+    text-align: center;
+    flex-grow: 1;
+    font-weight: 550;
+}
+
+.side-menu {
+    position: fixed;
+    top: 0;
+    left: -250px;
+    width: 250px; /* Smalle breedte */
+    height: 100%; /* Volledige hoogte */
+    background-color: #4CAF50; /* Donkere achtergrondkleur */
+    color: white;
+    transition: left 0.3s ease;
+    z-index: 1000;
+    margin-top: 50px;
+}
+
+.side-menu ul {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 50px; /* Kleine ruimte vanaf de bovenkant */
+}
+
+.side-menu ul li {
+    padding: 15px;
+    border-bottom: 1px solid #444;
+}
+
+.side-menu ul li a {
+    color: white;
+    text-decoration: none;
+    display: block;
+}
+
+.side-menu ul li a:hover {
+    background-color: #575757;
+}
+
+.side-menu.active {
+    left: 0; /* Schuift naar rechts als de 'active' klasse wordt toegevoegd */
+}
+
     </style>
 </head>
 <body class="dark-mode">
-    <div class="toggle-button">
-        <button id="mode-toggle" class="dark-mode">Light Mode</button>
-    </div>
+    <header id="header">
+        <div class="menu-bar">
+            <div class="hamburger" id="hamburger">&#9776;</div>
+            <div class="menu-title">BubbleCloud</div>
+            <div class="toggle-button">
+                <button id="mode-toggle" class="dark-mode">Light Mode</button>
+            </div>
+        </div>
+        <nav class="side-menu" id="side-menu">
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="#">Over ons</a></li>
+                <li><a href="#">Diensten</a></li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+    <br>
     <div class="container dark-mode">
-        <h1>BubbleCloud</h1>
 
         <!-- Dark Mode / Light Mode Toggle -->
 
@@ -170,7 +255,7 @@
         </ul>
     </div>
     <div id="footer">
-        <p><a href="" class="dark-mode">Github</a></p>
+        <p><a href="https://github.com/JesseHoekema/BubbleCloud" class="dark-mode">Github</a></p>
     </div>
 
     <script>
@@ -213,7 +298,8 @@
                 toggleButton.textContent = 'Light Mode';
             }
         });
-        
+        // Menu Bar Avalible = No 
+        // document.getElementById('hamburger').addEventListener('click', function() { var sideMenu = document.getElementById('side-menu'); sideMenu.classList.toggle('active') }); ///
     </script>
 </body>
 </html>
