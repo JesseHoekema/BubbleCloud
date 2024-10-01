@@ -1,4 +1,4 @@
-name: Build and Run Docker Container
+name: Test Docker Flask App with Node.js 20
 
 on:
   push:
@@ -6,18 +6,21 @@ on:
       - main
 
 jobs:
-  build-and-run:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v3  # Deze werkt met Node.js 20
 
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
+      uses: docker/setup-buildx-action@v2  # Deze werkt ook met Node.js 20
 
     - name: Build Docker image
-      run: docker build -t my-app-image .
+      run: docker build -t my-flask-app .
 
-    - name: Run Docker container
-      run: docker run -d -p 5000:5000 --name flask-app my-app-image
+    - name: Run Docker container with port forwarding
+      run: docker run -d -p 5000:5000 --name flask-app my-flask-app
+
+    - name: Test if the Flask app is running
+      run: curl http://localhost:5000
