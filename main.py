@@ -782,7 +782,10 @@ def update_private_files():
 
 @app.route("/app-api/get-files")
 def get_all_files():
-    if "user" not in session:
+    user_in_session = "user" in session
+    token = request.cookies.get("session")  # Flask reads cookies automatically
+
+    if not user_in_session and not token:
         return redirect(url_for("login"))
 
     def get_category(filename):
@@ -809,6 +812,71 @@ def get_all_files():
             files_info.append(file_info)
 
     return render_template("/app/get.html", files=files_info[::-1])
+
+@app.route("/app-api/upload-files", methods=["POST"])
+def app_api_upload():
+    if "user" not in session:
+        return redirect(url_for("login"))
+ 
+    if "file" not in request.files:
+        return jsonify({"status": "error", "message": "No file provided"}), 400
+
+    files = request.files.getlist("file")
+    saved_files = []
+
+    for file in files:
+        if file and file.filename != "":
+            filepath = os.path.join(UPLOAD_FOLDER, file.filename)
+            file.save(filepath)
+            saved_files.append(file.filename)
+
+    if not saved_files:
+        return jsonify({"status": "error", "message": "No valid files uploaded"}), 400
+
+    return jsonify({
+        "status": "success",
+        "message": f"{len(saved_files)} file(s) uploaded successfully",
+        "files": saved_files
+    }), 200
+    
+    
+from flask import Flask, request, session, jsonify, redirect, url_for, render_template
+from werkzeug.security import check_password_hash
+
+@app.route("/app-api/login-page", methods=["GET", "POST"])
+def app_api_login_page():
+    account = load_account()
+    if not account:
+        return redirect(url_for("register"))
+
+    error = ""
+    if request.method == "POST":
+        username = request.form["username"].strip()
+        password = request.form["password"]
+
+        if username == account["username"]:
+            valid = False
+            if account["encrypted"]:
+                valid = check_password_hash(account["password"], password)
+            else:
+                valid = password == account["password"]
+
+            if valid:
+                session["user"] = username
+                # Return the value of the session cookie
+                session_token = request.cookies.get("session")
+                return jsonify({"session": session_token})
+            else:
+                error = "Invalid password"
+        else:
+            error = "Invalid username"
+
+        # Login failed → render login page with error
+        return render_template("app/login.html", error=error, username=username)
+
+    # GET request → render login page
+    return render_template("app/login.html", error=error)
+
 
 @app.route("/logout")
 def logout():
