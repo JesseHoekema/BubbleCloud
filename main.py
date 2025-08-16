@@ -39,7 +39,6 @@ def format_size(size_bytes):
     units = ["B", "KB", "MB", "GB", "TB"]
     
     try:
-        # Convert to float, treat None or invalid values as 0
         size = float(size_bytes or 0)
     except (ValueError, TypeError):
         size = 0
@@ -63,14 +62,12 @@ def load_recent_files():
     if os.path.exists(RECENT_FILES):
         with open(RECENT_FILES, "r") as f:
             data = json.load(f)
-            # convert list back to dict keyed by "name"
             if isinstance(data, list):
                 return {item["name"]: {"last_opened": item["last_opened"], "size_bytes": item["size_bytes"]} for item in data}
             return data
     return {}
 
 def save_recent_files(data):
-    # data is dict keyed by filename, convert to list with "name" key
     list_data = [
         {"name": name, "last_opened": info.get("last_opened"), "size_bytes": info.get("size_bytes")}
         for name, info in data.items()
@@ -97,7 +94,6 @@ def get_storage_usage():
                 usage_bytes["Other"] += size_bytes
 
     total_bytes = sum(usage_bytes.values())
-    # Format sizes to human readable strings
     usage = {cat: format_size(size) for cat, size in usage_bytes.items()}
     total = format_size(total_bytes)
 
@@ -114,7 +110,7 @@ def get_files_info():
             files.append({
                 "filename": filename,
                 "size": stat.st_size,
-                "created": stat.st_ctime  # creation time (Unix timestamp)
+                "created": stat.st_ctime 
             })
 
     files.sort(key=lambda x: x["created"], reverse=True)
@@ -164,7 +160,6 @@ def inject_common_data():
     name = account.get("name") if account else None
 
     recent_files = load_recent_files()
-    # Only keep files that actually exist and have a valid dict
     recent_files = {
         f: info if isinstance(info, dict) else {}
         for f, info in recent_files.items() if f in files
@@ -176,7 +171,6 @@ def inject_common_data():
         reverse=True
     )[:4]
 
-    # Ensure size_bytes is never None
     recent_files_list = [
         {
             "name": f,
@@ -220,7 +214,7 @@ def register():
         username = request.form["username"].strip()
         password = request.form["password"]
         encryption = request.form["encryption"]
-        name = request.form["name"].strip()  # new
+        name = request.form["name"].strip()
 
         if encryption == "hashed":
             password = generate_password_hash(password)
@@ -374,7 +368,6 @@ def list_files():
     for filename in os.listdir(UPLOAD_FOLDER):
         file_path = os.path.join(UPLOAD_FOLDER, filename)
 
-        # Skip directories, only include files
         if os.path.isfile(file_path):
             file_stat = os.stat(file_path)
 
@@ -531,22 +524,17 @@ def delete_account():
         flash("Account not found", "error")
         return jsonify({"error": "Account not found"}), 404
 
-    # Delete account file
     if os.path.exists(ACCOUNT_FILE):
         os.remove(ACCOUNT_FILE)
 
-    # Delete uploaded files folder if it exists
     if os.path.exists(UPLOAD_FOLDER) and os.path.isdir(UPLOAD_FOLDER):
         shutil.rmtree(UPLOAD_FOLDER)
 
-    # Delete folders JSON if it exists
     if os.path.exists(FOLDERS_JSON):
         os.remove(FOLDERS_JSON)
 
-    # Recreate an empty upload folder to avoid FileNotFoundError in inject_common_data
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-    # Clear session
     session.clear()
 
     flash("Account deleted successfully", "success")
@@ -568,7 +556,6 @@ def view_folder(folder_name):
 
     folders_list = load_folders()
 
-    # Find the folder by exact name
     folder = next((f for f in folders_list if f["name"] == folder_name), None)
 
     if not folder:
@@ -583,7 +570,6 @@ def create_folder():
     if "user" not in session:
         return jsonify({"error": "Unauthorized"}), 401
 
-    # Support both JSON and form submissions
     if request.is_json:
         data = request.get_json()
         folder_name = data.get("name")
@@ -703,7 +689,6 @@ def delete_file_from_folder():
     if not folder:
         return jsonify({"error": "Folder not found"}), 404
 
-    # Remove the file from the folder's files list
     original_count = len(folder["files"])
     folder["files"] = [f for f in folder["files"] if f["name"] != file_name]
     if len(folder["files"]) == original_count:
@@ -782,11 +767,9 @@ def update_private_files():
 
 @app.route("/app-api/get-files")
 def get_all_files():
-    # Check session cookie
     user_in_session = "user" in session
     session_token = request.cookies.get("session")
 
-    # Check Authorization header
     auth_header = request.headers.get("Authorization")
     header_token = None
     if auth_header and auth_header.startswith("Bearer "):
@@ -871,10 +854,9 @@ def app_api_login_page():
         else:
             error = "Invalid username"
 
-        # Login failed → render login page with error
         return render_template("app/login.html", error=error, username=username)
 
-    # GET request → render login page
+
     return render_template("app/login.html", error=error)
 
 @app.route("/app-api/session-token")
