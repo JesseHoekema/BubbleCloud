@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/JesseHoekema/BubbleCloud/blob/main/static/logo_text_big.png?raw=true" alt="Project Logo" width="400"/>
+  <img src="https://github.com/JesseHoekema/BubbleCloud/blob/main/static/logo_text_big.png?raw=true" alt="Project Logo" width="500"/>
 </p>
 <p align="center">
   <img alt="Github top language" src="https://img.shields.io/github/languages/top/JesseHoekema/BubbleCloud?color=56BEB8">
