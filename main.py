@@ -782,10 +782,17 @@ def update_private_files():
 
 @app.route("/app-api/get-files")
 def get_all_files():
+    # Check session cookie
     user_in_session = "user" in session
-    token = request.cookies.get("session")  # Flask reads cookies automatically
+    session_token = request.cookies.get("session")
 
-    if not user_in_session and not token:
+    # Check Authorization header
+    auth_header = request.headers.get("Authorization")
+    header_token = None
+    if auth_header and auth_header.startswith("Bearer "):
+        header_token = auth_header.split(" ")[1]
+
+    if not user_in_session and not session_token and not header_token:
         return redirect(url_for("login"))
 
     def get_category(filename):
@@ -799,17 +806,14 @@ def get_all_files():
     for filename in os.listdir(UPLOAD_FOLDER):
         file_path = os.path.join(UPLOAD_FOLDER, filename)
 
-        # Skip directories, only include files
         if os.path.isfile(file_path):
             file_stat = os.stat(file_path)
-
-            file_info = {
+            files_info.append({
                 "name": filename,
                 "last_opened": datetime.fromtimestamp(file_stat.st_atime).isoformat(),
                 "size_bytes": format_size(file_stat.st_size),
                 "type": get_category(filename)
-            }
-            files_info.append(file_info)
+            })
 
     return render_template("/app/get.html", files=files_info[::-1])
 
@@ -838,10 +842,7 @@ def app_api_upload():
         "message": f"{len(saved_files)} file(s) uploaded successfully",
         "files": saved_files
     }), 200
-    
-    
-from flask import Flask, request, session, jsonify, redirect, url_for, render_template
-from werkzeug.security import check_password_hash
+
 
 @app.route("/app-api/login-page", methods=["GET", "POST"])
 def app_api_login_page():
@@ -863,9 +864,8 @@ def app_api_login_page():
 
             if valid:
                 session["user"] = username
-                # Return the value of the session cookie
-                session_token = request.cookies.get("session")
-                return jsonify({"session": session_token})
+                
+                return redirect(url_for("return_session_token"))
             else:
                 error = "Invalid password"
         else:
@@ -876,6 +876,11 @@ def app_api_login_page():
 
     # GET request → render login page
     return render_template("app/login.html", error=error)
+
+@app.route("/app-api/session-token")
+def return_session_token():
+    session_token = request.cookies.get("session")
+    return jsonify({"session": session_token})
 
 
 @app.route("/logout")

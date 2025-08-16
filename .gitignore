@@ -1,3 +1,4 @@
 app-files/*
 
 !app-files/.gitkeep
+package.json
