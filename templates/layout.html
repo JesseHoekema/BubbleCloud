@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}CloudStore{% endblock %}</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='logo_favicon.png') }}" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css"
+        integrity="sha512-DxV+EoADOkOygM4IR9yXP8Sb2qwgidEmeqAEmDKIOfPRQZOWbXCzLC6vjbZyy0vPisbH2SyW27+ddLVCN+OMzQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    {{ toastr.include_jquery() }}
+    {{ toastr.include_toastr_css() }}
+    {{ toastr.message() }}
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+        .breadcrumb a {
+            color: #666;
+            text-decoration: none;
+        }
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        .sidebar {
+            width: 200px;
+            background: white;
+            border-right: 1px solid #e9ecef;
+            padding: 20px 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            padding: 0 20px 20px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #4285f4;
+        }
+        .logo img {
+            height: 28px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            color: #666;
+            text-decoration: none;
+            font-size: 14px;
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .nav-item.active {
+            background-color: #e3f2fd;
+            color: #4285f4;
+            font-weight: 500;
+        }
+
+        .nav-item i {
+            margin-right: 10px;
+            width: 16px;
+            font-size: 14px;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            margin-left: 15%;
+            margin-right: 19%;
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 20px 30px;
+        }
+
+        .right-sidebar {
+            width: 280px;
+            background: white;
+            border-left: 1px solid #e9ecef;
+            padding: 20px;
+            position: fixed;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            overflow-y: auto;
+        }
+
+        .storage-usage {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .usage-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .usage-chart {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+            position: relative;
+        }
+
+        .usage-percentage {
+            font-size: 15px;
+            font-weight: 600;
+            color: #4285f4;
+        }
+
+        .usage-label {
+            color: #666;
+            font-size: 12px;
+        }
+
+        .usage-breakdown {
+            margin-top: 20px;
+        }
+
+        .usage-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+
+        .usage-item-label {
+            display: flex;
+            align-items: center;
+        }
+
+        .usage-color {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .color-documents {
+            background-color: #4285f4;
+        }
+
+        .color-images {
+            background-color: #4caf50;
+        }
+
+        .color-videos {
+            background-color: #ffa726;
+        }
+
+        .color-others {
+            background-color: #9e9e9e;
+        }
+        .color-music {
+            background-color: #9c27b0;
+        }   
+
+        .quick-access {
+            margin-bottom: 30px;
+        }
+
+        .quick-access-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            font-size: 12px;
+            text-decoration: none;
+        }
+
+        .quick-access-icon {
+            width: 16px;
+            height: 16px;
+            margin-right: 10px;
+            border-radius: 2px;
+        }
+        .icon-documents {
+            background-color: #4285f4;
+        }
+        .icon-images {
+            background-color: #4caf50;
+        }
+        .icon-music {
+            background-color: #9c27b0;
+        }
+        .icon-videos {
+            background-color: #ffa726;
+        }
+        .icon-others {
+            background-color: #9e9e9e;
+        }
+
+        .quick-access-info {
+            flex: 1;
+        }
+
+        .quick-access-name {
+            font-weight: 500;
+            margin-bottom: 2px;
+            text-decoration: none;
+        }
+        #link-quick-access {
+            text-decoration: none;
+            color: black;
+        }
+
+        .quick-access-meta {
+            color: #666;
+        }
+
+        .shared-with {
+            margin-bottom: 30px;
+        }
+
+        .shared-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+        }
+
+        .shared-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: #4285f4;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .shared-info {
+            flex: 1;
+        }
+
+        .shared-name {
+            font-weight: 500;
+            font-size: 12px;
+            margin-bottom: 2px;
+        }
+
+        .shared-email {
+            color: #666;
+            font-size: 11px;
+        }
+        .logout-btn {
+            position: absolute;
+            bottom: 10px;
+            left: 0px;
+            right: 0px;
+        }
+        .documents {
+            color: #4285f4;
+        }
+        .images {
+            color: #4caf50;
+        }
+        .music {
+            color: #9c27b0;
+        }
+        .videos {
+            color: #ffa726;
+        }
+        .others {
+            color: #9e9e9e;
+        }
+
+        /* NOTE: Medium devices (tablets) */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 160px;
+            }
+
+            .right-sidebar {
+                width: 220px;
+            }
+
+            .main-content {
+                margin-left: 160px;
+                margin-right: 220px;
+            }
+            .logout-btn {
+                display: block;
+            }
+        }
+
+        /* NOTE: Small devices (phones) */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+                border-right: none;
+                border-bottom: 1px solid #e9ecef;
+                padding: 10px 0;
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .logo {
+                width: 100%;
+                justify-content: center;
+                padding: 0 0 10px 0;
+            }
+
+            .nav-item {
+                padding: 8px 12px;
+                font-size: 13px;
+                flex: 1 1 auto;
+                justify-content: center;
+                text-align: center;
+            }
+
+            .main-content {
+                margin: 0;
+                width: 100%;
+            }
+
+            .right-sidebar {
+                position: relative;
+                width: 100%;
+                border-left: none;
+                border-top: 1px solid #e9ecef;
+                margin-top: 20px;
+                padding: 15px 20px;
+            }
+
+            .content-area {
+                padding: 15px 10px;
+            }
+            .logout-btn {
+                display: block;
+            }
+        }
+
+        /* NOTE: very small phones */
+        @media (max-width: 480px) {
+            body {
+                font-size: 14px;
+            }
+
+            .nav-item {
+                font-size: 12px;
+                padding: 6px 8px;
+            }
+
+            .usage-title {
+                font-size: 13px;
+            }
+
+            .usage-percentage {
+                font-size: 14px;
+            }
+
+            .usage-label {
+                font-size: 11px;
+            }
+
+            .quick-access-name {
+                font-size: 12px;
+            }
+            .logout-btn {
+                display: block;
+            }
+        }
+    </style>
+    {% block extra_css %}
+    {% endblock %}
+</head>
+
+<body>
+    <!-- NOTE: Left Sidebar -->
+    <div class="container">
+        <div class="sidebar">
+            <div class="logo">
+                <img src="{{ url_for('static', filename='logo_text_big.png') }}" alt="Logo">
+            </div>
+            <a href="/dashboard" class="nav-item {% if active_page == 'dashboard' %}active{% endif %}">
+                <i class="fa-solid fa-house"></i>
+                Home
+            </a>
+            <a href="/files" class="nav-item {% if active_page == 'files' %}active{% endif %}">
+                <i class="fa-solid fa-folder"></i>
+                My Files
+            </a>
+            <a href="/folders" class="nav-item {% if active_page == 'folders' %}active{% endif %}">
+                <i class="fa-solid fa-folder-open"></i>
+                Folders
+            </a>
+            <a href="/recents" class="nav-item {% if active_page == 'recents' %}active{% endif %}">
+                <i class="fa-solid fa-clock"></i>
+                Recents
+            </a>
+            <a href="/settings" class="nav-item {% if active_page == 'settings' %}active{% endif %}">
+                <i class="fa-solid fa-cog"></i>
+                Settings
+            </a>
+            <a href="/logout" class="nav-item logout-btn">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                Logout
+            </a>
+        </div>
+
+        <div class="main-content">
+            <div class="content-area">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+
+        <!-- NOTE: Right Sidebar -->
+        <div class="right-sidebar">
+            <div class="storage-usage">
+                <div class="usage-title">Storage Usage</div>
+                <div class="usage-chart">
+                    <canvas id="myChart" width="120" height="120"></canvas>
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                        {% set number = total.split(' ')[0].split('.')[0] %}
+                        {% set unit = total.split(' ')[1] %}
+                        <div class="usage-percentage">{{ number }} {{ unit }}</div>
+                        <div class="usage-label">Used</div>
+                    </div>
+                </div>
+
+                <div class="usage-breakdown">
+                    <div class="usage-item">
+                        <div class="usage-item-label">
+                            <span class="usage-color color-documents"></span>
+                            Documents
+                        </div>
+                        <span>{{ categories['Documents'] }}</span>
+                    </div>
+                    <div class="usage-item">
+                        <div class="usage-item-label">
+                            <span class="usage-color color-images"></span>
+                            Images
+                        </div>
+                        <span>{{ categories['Images'] }}</span>
+                    </div>
+                    <div class="usage-item">
+                        <div class="usage-item-label">
+                            <span class="usage-color color-videos"></span>
+                            Videos
+                        </div>
+                        <span>{{ categories['Videos'] }}</span>
+                    </div>
+                    <div class="usage-item">
+                        <div class="usage-item-label">
+                            <span class="usage-color color-music"></span>
+                            Music
+                        </div>
+                        <span>{{ categories['Music'] }}</span>
+                    </div>
+                    <div class="usage-item">
+                        <div class="usage-item-label">
+                            <span class="usage-color color-others"></span>
+                            Others
+                        </div>
+                        <span>{{ categories['Other'] }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quick-access">
+                <div class="usage-title">Quick Access</div>
+                {% for recent_file in recent_files[:3] %}
+                <a href="/files/{{ recent_file.name }}" target="_blank" rel="no-referrer" id="link-quick-access">
+                    <div class="quick-access-item">
+                        <div class="quick-access-icon icon-{{ recent_file.type | lower }}"></div>
+                        <div class="quick-access-info">
+                            <div class="quick-access-name">{{ recent_file.name }}</div>
+                            <div class="quick-access-meta">{{ recent_file.size_bytes }} <!-- NOTE: • {{ recent_file.last_opened }} --></div>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <meta id="my-data" data-documents="{{ categories['Documents'] }}" data-videos="{{ categories['Videos'] }}"
+        data-images="{{ categories['Images'] }}" data-music="{{ categories['Music'] }}" data-other="{{ categories['Other'] }}" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    {{ toastr.include_toastr_js() }}
+
+    <script>
+        $(document).ready(function () {
+            function convertToMB(sizeString) {
+                const units = ["B", "KB", "MB", "GB", "TB"];
+                const regex = /^([\d.]+)\s*(B|KB|MB|GB|TB)$/i;
+                const match = sizeString.match(regex);
+                if (!match) return 0;
+                let [_, value, unit] = match;
+                value = parseFloat(value);
+                unit = unit.toUpperCase();
+                const index = units.indexOf(unit);
+                if (index === -1) return 0;
+                return value * Math.pow(1024, index - 2);
+            }
+
+            // Ensure tiny slices are visible by giving a minimum visual size
+            function normalizeForChart(values, minPercent = 0.02) { // 2% minimum
+                const total = values.reduce((a, b) => a + b, 0);
+                return values.map(v => v === 0 ? 0 : Math.max(v, total * minPercent));
+            }
+
+            var data = $("#my-data").data();
+
+            const documentsMB = convertToMB(data.documents);
+            const videosMB = convertToMB(data.videos);
+            const imagesMB = convertToMB(data.images);
+            const musicMB = convertToMB(data.music);
+            const otherMB = convertToMB(data.other);
+
+            const realData = [documentsMB, videosMB, imagesMB, musicMB, otherMB];
+            const displayData = [
+                data.documents,
+                data.videos,
+                data.images,
+                data.music,
+                data.other
+            ];
+            const chartData = normalizeForChart(realData);
+
+            const ctx = document.getElementById("myChart").getContext("2d");
+            new Chart(ctx, {
+                type: "doughnut",
+                data: {
+                    labels: ["Documents", "Videos", "Images", "Music", "Other"],
+                    datasets: [{
+                        data: chartData,
+                        backgroundColor: ["#4285f4", "#ffa726", "#4caf50", "#9c27b0", "#9e9e9e"]
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    cutout: "70%",
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                return context.label + ": " + displayData[context.dataIndex];
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>

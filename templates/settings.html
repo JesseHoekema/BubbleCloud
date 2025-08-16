@@ -1,0 +1,441 @@
+{% extends "layout.html" %}
+
+{% block title %}BubbleCloud - Settings{% endblock %}
+
+{% block extra_css %}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background-color: #f5f5f7;
+        color: #333;
+    }
+
+    .main-settings {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    h1 {
+        font-size: 32px;
+        font-weight: 600;
+        margin-bottom: 30px;
+        color: #1d1d1f;
+    }
+
+    .settings-section {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 24px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .section-icon {
+        width: 34px;
+        height: 34px;
+        margin-right: 8px;
+        color: #007aff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #e5f2ff;
+        border-radius: 10px;
+    }
+
+    .fa-database {
+        color: #FF4D4F;
+        background-color: #FFF1F2;
+    }
+
+    .section-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1d1d1f;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        display: block;
+        font-size: 14px;
+        font-weight: 500;
+        color: #1d1d1f;
+        margin-bottom: 6px;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1px solid #d1d1d6;
+        border-radius: 8px;
+        font-size: 14px;
+        background: white;
+        transition: border-color 0.2s;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: #007aff;
+        box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+    }
+
+    .form-input:disabled {
+        background-color: #f5f5f7;
+        color: #86868b;
+    }
+
+    .form-note {
+        font-size: 12px;
+        color: #86868b;
+        margin-top: 4px;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+        margin-top: 20px;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        border-radius: 8px;
+        border: none;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-secondary {
+        background: #f5f5f7;
+        color: #1d1d1f;
+    }
+
+    .btn-secondary:hover {
+        background: #e5e5e7;
+    }
+
+    .btn-primary {
+        background: #1878FF;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #0056d6;
+    }
+
+    .btn-danger {
+        background: #ff3b30;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background: #d70015;
+    }
+
+    .warning-box {
+        background: #fff5f5;
+        border: 1px solid #fecaca;
+        border-left: 4px solid #ef4444;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+
+    .warning-text {
+        font-size: 14px;
+        color: #dc2626;
+    }
+
+    .warning-label {
+        font-weight: 600;
+        color: #dc2626;
+    }
+
+    .toggle-container {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        outline: none;
+    }
+
+    .toggle-switch {
+        position: relative;
+        width: 44px;
+        height: 22px;
+        background-color: #e0e0e0;
+        border-radius: 11px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        border: none;
+        outline: none;
+    }
+
+    .toggle-switch.active {
+        background-color: #007AFF;
+    }
+
+    .toggle-knob {
+        position: absolute;
+        top: 1px;
+        left: 1px;
+        width: 20px;
+        height: 20px;
+        background-color: white;
+        border-radius: 50%;
+        transition: transform 0.3s ease;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        outline: none;
+    }
+
+    .toggle-switch.active .toggle-knob {
+        transform: translateX(22px);
+    }
+
+    .toggle-label {
+        font-size: 14px;
+        color: #333;
+        user-select: none;
+        cursor: pointer;
+    }
+
+    .toggle-switch:hover {
+        opacity: 0.8;
+    }
+
+    #warning-privacy {
+        font-size: 12px;
+        margin-top: 15px;
+        color: #6D6E76;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="main-settings">
+    <h1>Settings</h1>
+
+    <div class="settings-section">
+        <div class="section-header">
+            <span class="section-icon fa-solid fa-user"></span>
+            <h2 class="section-title">Account Settings</h2>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="full-name">Full Name</label>
+            <input type="text" id="full-name" class="form-input" value="{{ name }}">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="username">Username</label>
+            <input type="text" id="username" class="form-input" value="{{ account.username }}">
+        </div>
+
+        <div class="button-group">
+            <button class="btn btn-secondary" type="button" id="cancel-btn">Cancel</button>
+            <button class="btn btn-primary" type="button" id="save-btn">Save Changes</button>
+        </div>
+    </div>
+
+    <div class="settings-section" id="security-settings">
+        <div class="section-header">
+            <i class="section-icon fa-solid fa-shield-halved"></i>
+            <h2 class="section-title">Security</h2>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="current-password">Current Password</label>
+            <input type="password" id="current-password" class="form-input">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="new-password">New Password</label>
+            <input type="password" id="new-password" class="form-input">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="confirm-password">Confirm New Password</label>
+            <input type="password" id="confirm-password" class="form-input">
+        </div>
+
+        <div class="button-group">
+            <button class="btn btn-secondary" id="cancel-btn">Cancel</button>
+            <button class="btn btn-primary" id="update-password-btn">Update Password</button>
+        </div>
+    </div>
+    <div class="settings-section" id="privacy">
+        <div class="section-header">
+            <i class="section-icon fa-solid fa-lock"></i>
+            <h2 class="section-title">Privacy & Accessibility</h2>
+        </div>
+        <div class="form-group">
+            <div class="toggle-container">
+                <button class="toggle-switch" id="toggle" aria-label="Make files publicly accessible">
+                    <div class="toggle-knob"></div>
+                </button>
+                <label class="toggle-label" for="toggle">Make files publicly accessible</label>
+            </div>
+            <p id="warning-privacy">Making files publicly accessible means anyone with the link can view them without logging in.</p>
+        </div>
+    </div>
+
+    <div class="settings-section" id="data-management">
+        <div class="section-header">
+            <span class="section-icon fa-solid fa-database"></span>
+            <h2 class="section-title">Data Management</h2>
+        </div>
+
+        <div class="warning-box">
+            <span class="warning-label">Warning:</span>
+            <span class="warning-text"> Deleting your data is permanent and cannot be undone. All your files, folders,
+                and account information will be permanently removed.</span>
+        </div>
+
+        <div class="button-group">
+            <button class="btn btn-danger" id="delete-data-btn">Delete All My Data</button>
+        </div>
+    </div>
+</div>
+<script>
+    document.getElementById('save-btn').addEventListener('click', function () {
+        const name = document.getElementById('full-name').value.trim();
+        const username = document.getElementById('username').value.trim();
+
+        fetch('/api/settings/user', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ name: name, username: username })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to save changes.');
+            }
+            return response.json();
+        })
+        .then(data => {
+            window.location.reload();
+        })
+        .catch(error => {
+            console.error(error);
+            window.location.reload();
+        });
+    });
+    document.getElementById('update-password-btn').addEventListener('click', function () {
+        const currentPassword = document.getElementById('current-password').value.trim();
+        const newPassword = document.getElementById('new-password').value.trim();
+        const confirmPassword = document.getElementById('confirm-password').value.trim();
+
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            window.location.reload();
+            return;
+        }
+        if (newPassword !== confirmPassword) {
+            window.location.reload();
+            return;
+        }
+
+        fetch('/api/settings/password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ current_password: currentPassword, new_password: newPassword })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            } else {
+                alert("Error updating password: " + data.error);
+            }
+        });
+
+    });
+
+    document.getElementById('cancel-btn').addEventListener('click', function () {
+        window.location.reload();
+    });
+
+    document.getElementById('delete-data-btn').addEventListener('click', function () {
+        if (confirm("Are you sure you want to delete all your data? This action cannot be undone.")) {
+            fetch('/api/settings/delete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    alert("Error deleting data: " + data.error);
+                }
+            });
+        }
+    });
+</script>
+<script>
+    const toggle = document.getElementById('toggle');
+    const label = document.querySelector('label[for="toggle"]');
+
+    function handleToggle() {
+        toggle.classList.toggle('active');
+        toggle.setAttribute('aria-checked', toggle.classList.contains('active'));
+    }
+
+    toggle.addEventListener('click', handleToggle);
+    label.addEventListener('click', handleToggle);
+
+    toggle.addEventListener('keydown', (e) => {
+        if (e.key === ' ' || e.key === 'Enter') {
+            e.preventDefault();
+            handleToggle();
+        }
+    });
+    async function updatePrivateFiles(value) {
+        try {
+            const response = await fetch("/update-private-files", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ "private-files": value })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error("Error updating private-files:", errorData.error);
+                return;
+            }
+
+            const result = await response.json();
+            console.log("Updated successfully:", result);
+        } catch (err) {
+            console.error("Request failed:", err);
+        }
+    }
+
+    toggle.addEventListener('click', () => {
+        const isActive = toggle.classList.contains('active');
+        updatePrivateFiles(!isActive); 
+    });
+
+    toggle.setAttribute('role', 'switch');
+    toggle.setAttribute('aria-checked', 'false');
+</script>
+{% endblock %}

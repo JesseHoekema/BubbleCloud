@@ -1,0 +1,655 @@
+{% extends "layout.html" %}
+
+{% block title %}BubbleCloud - Folders{% endblock %}
+
+{% block extra_css %}
+<style>
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .header-left {
+        flex: 1;
+    }
+
+    .search-bar {
+        width: 300px;
+        max-width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #e9ecef;
+        border-radius: 6px;
+        font-size: 14px;
+        background-color: white;
+    }
+
+    .header-right {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        white-space: nowrap;
+    }
+
+    .user-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background-color: #4285f4;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+    }
+
+    .page-title {
+        font-size: 24px;
+        font-weight: 600;
+    }
+
+    .breadcrumb {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 5px;
+    }
+
+    .breadcrumb a {
+        color: #666;
+        text-decoration: none;
+    }
+
+    .breadcrumb a:hover {
+        text-decoration: underline;
+    }
+
+    .page-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        border: 1px solid #e9ecef;
+        background: white;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background-color: #4285f4;
+        color: white;
+        border-color: #4285f4;
+    }
+
+    .section {
+        margin-bottom: 40px;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .section-title {
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    .view-all {
+        color: #4285f4;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+    }
+
+    .folder-item,
+    .file-item {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+        border: 1px solid #f0f0f0;
+        transition: box-shadow 0.2s;
+        position: relative;
+    }
+
+    .folder-item:hover,
+    .file-item:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .folder-icon {
+        font-size: 48px;
+        margin-bottom: 15px;
+        color: #ffa726;
+    }
+
+    .file-icon {
+        font-size: 48px;
+        margin-bottom: 15px;
+    }
+
+    .file-icon.docx {
+        color: #4285f4;
+    }
+
+    .file-icon.pdf {
+        color: #ff4444;
+    }
+
+    .file-icon.png {
+        color: #4caf50;
+    }
+
+    .file-icon.xlsx {
+        color: #0d7377;
+    }
+
+    .item-name {
+        font-weight: 600;
+        margin-bottom: 8px;
+        font-size: 14px;
+        display: block;
+        overflow-wrap: break-word;
+    }
+
+    .item-info {
+        color: #666;
+        font-size: 12px;
+        margin-top: 10px;
+    }
+
+    /* 3-dot menu styles */
+    .file-actions {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        display: none;
+        z-index: 20;
+    }
+
+    .folder-item:hover .file-actions {
+        display: block;
+    }
+
+    .file-actions button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 18px;
+        color: #666;
+    }
+
+    .action-menu {
+        position: absolute;
+        top: 30px;
+        right: 8px;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        display: none;
+        flex-direction: column;
+        z-index: 30;
+        min-width: 120px;
+    }
+
+    .action-menu button {
+        padding: 8px 12px;
+        border: none;
+        background: white;
+        cursor: pointer;
+        font-size: 14px;
+        text-align: left;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .action-menu button:hover {
+        background: #f5f5f5;
+    }
+
+    .folder-item:not(:hover) .action-menu {
+        display: none;
+    }
+
+
+    /* NOTE: Tablets and smaller */
+    @media (max-width: 1024px) {
+        .grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .search-bar {
+            width: 100%;
+            max-width: 300px;
+        }
+    }
+
+    /* NOTE: Small devices */
+    @media (max-width: 768px) {
+        .header {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .header-left {
+            flex: none;
+        }
+
+        .search-bar {
+            width: 100%;
+            max-width: none;
+            font-size: 16px;
+        }
+
+        .header-right {
+            justify-content: flex-start;
+            gap: 10px;
+        }
+
+        .user-info span {
+            display: none; 
+        }
+
+        .user-info .user-avatar {
+            display: none;
+        }
+
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .page-title {
+            font-size: 20px;
+        }
+
+        .breadcrumb {
+            font-size: 13px;
+        }
+
+        .page-actions {
+            width: 100%;
+            justify-content: flex-start;
+        }
+
+        .grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .folder-item,
+        .file-item {
+            padding: 15px;
+        }
+
+        .folder-icon,
+        .file-icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+        }
+
+        .item-name {
+            font-size: 13px;
+        }
+
+        .item-info {
+            font-size: 11px;
+        }
+    }
+
+    /* NOTE: Extra small devices  */
+    @media (max-width: 480px) {
+        .grid {
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .folder-item,
+        .file-item {
+            padding: 12px;
+        }
+
+        .folder-icon,
+        .file-icon {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .item-name {
+            font-size: 12px;
+        }
+
+        .item-info {
+            font-size: 10px;
+        }
+
+        .search-bar {
+            font-size: 14px;
+            padding: 6px 10px;
+        }
+
+        .page-title {
+            font-size: 18px;
+        }
+
+        .breadcrumb {
+            font-size: 12px;
+        }
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 200;
+        padding-top: 100px;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-content {
+        background-color: #fff;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #ddd;
+        width: 300px;
+        border-radius: 8px;
+        text-align: center;
+    }
+
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 24px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .close:hover {
+        color: #000;
+    }
+
+    .modal input {
+        width: 100%;
+        padding: 8px;
+        margin-top: 15px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        font-size: 14px;
+    }
+
+    .modal button {
+        margin-top: 15px;
+        padding: 8px 16px;
+        background-color: #4285f4;
+        border: none;
+        color: white;
+        border-radius: 6px;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    .modal button:hover {
+        background-color: #357ae8;
+    }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="header">
+    <div class="header-left">
+        <input type="text" class="search-bar" id="search-bar" placeholder="Search files, folders...">
+    </div>
+    <div class="header-right">
+        <div class="user-info">
+            <div class="user-avatar">{{ name[0] }}</div>
+            <span>{{ name }}</span>
+        </div>
+    </div>
+</div>
+<div class="page-header">
+    <div>
+        <div class="breadcrumb">
+            <a href="{{ url_for('dashboard') }}">Home</a> &gt;
+            <span>My Folders</span>
+        </div>
+        <h1 class="page-title">My Folders</h1>
+    </div>
+    <div class="page-actions">
+        <button onclick="openFolderModal()" class="btn btn-primary">
+            <i class="fa-solid fa-plus"></i> Create
+        </button>
+    </div>
+</div>   
+<div class="section">
+    <div class="grid">
+        {% for folder in folders %}
+        <div class="folder-item">
+            <div class="file-actions">
+                <button onclick="toggleMenu(event)" aria-label="File actions">
+                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                </button>
+                <div class="action-menu">
+                    <button onclick="openEditModal('{{ folder.name }}')" type="button">
+                        <i class="fa-solid fa-pen-to-square"></i> Edit
+                    </button>
+                    <button onclick="deleteFolder('{{ folder.name }}')" type="button">
+                        <i class="fa-solid fa-trash"></i> Delete
+                    </button>
+                </div>
+            </div>
+
+            <a href="{{ url_for('view_folder', folder_name=folder.name) }}" style="text-decoration: none; color: black;"
+                class="item-name">
+                <div class="folder-icon"><i class="fa-solid fa-folder"></i></div>
+                <span class="file-name">
+                    {{ folder.name[:38] }}{% if folder.name|length > 38 %}...{% endif %}
+                </span>
+            </a>
+        </div>
+        <div id="editModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeEditModal()">&times;</span>
+                <h2>Edit Folder</h2>
+                <form id="editFolderForm">
+                    <input type="hidden" id="oldFolderName" name="old_name" value="{{ folder.name }}">
+                    <label for="folderName">Folder Name:</label>
+                    <input type="text" id="folderName" name="new_name" required>
+                    <button type="submit">Save</button>
+                </form>
+                <p id="editError" style="color:red;"></p>
+            </div>
+        </div>
+        {% else %}
+        <p>No folders created yet.</p>
+        {% endfor %}
+    </div>
+</div>
+<div id="folderModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeFolderModal()">&times;</span>
+        <h2>Create Folder</h2>
+        <form id="createFolderForm" method="POST" action="/create-folder">
+            <label for="createFolderName">Name:</label>
+            <input type="text" id="createFolderName" name="name" required>
+            <button type="submit">Create</button>
+        </form>
+        <p id="createError" style="color:red;"></p>
+    </div>
+</div>
+<script>
+function toggleMenu(event) {
+    event.stopPropagation();
+    const menu = event.currentTarget.nextElementSibling;
+    document.querySelectorAll('.action-menu').forEach(m => {
+        if (m !== menu) m.style.display = 'none';
+    });
+    menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+}
+
+document.addEventListener('click', () => {
+    document.querySelectorAll('.action-menu').forEach(m => m.style.display = 'none');
+});
+function openEditModal(folderName) {
+    document.getElementById("editModal").style.display = "block";
+    document.getElementById("folderName").value = folderName;
+}
+
+function closeEditModal() {
+    document.getElementById("editModal").style.display = "none";
+}
+window.onclick = function(event) {
+    const modal = document.getElementById("editModal");
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+function openFolderModal() {
+    document.getElementById("folderModal").style.display = "block";
+}
+function closeFolderModal() {
+    document.getElementById("folderModal").style.display = "none";
+}
+document.getElementById("editFolderForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const old_name = document.getElementById("oldFolderName").value;
+    const new_name = document.getElementById("folderName").value.trim();
+    const errorEl = document.getElementById("editError");
+
+    if (!new_name) {
+        errorEl.innerText = "Folder name cannot be empty.";
+        return;
+    }
+
+    try {
+        const response = await fetch("/edit-folder-name", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ old_name, new_name })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            errorEl.innerText = errorData.error || `Server error: ${response.status}`;
+            return;
+        }
+
+        const result = await response.json();
+
+        if (result.success) {
+            if (typeof closeEditModal === "function") closeEditModal();
+            location.reload();
+        } else {
+            errorEl.innerText = result.error || "Something went wrong";
+        }
+    } catch (err) {
+        console.error(err);
+        errorEl.innerText = "Error connecting to server";
+    }
+});
+
+// NOTE: This function was replaced by a form but keep it for some time when issues with it
+// document.getElementById("createFolderForm").addEventListener("submit", async function(e) {
+//     e.preventDefault();
+
+//     const folderInput = document.getElementById("createFolderName");
+//     const folderName = folderInput.value.trim();
+//     const errorEl = document.getElementById("createError");
+
+//     if (!folderName) {
+//         errorEl.innerText = "Folder name cannot be blank!";
+//         return;
+//     }
+
+//     try {
+//         const response = await fetch("/create-folder", {
+//             method: "POST",
+//             headers: { "Content-Type": "application/json" },
+//             body: JSON.stringify({ name: folderName })  // match Flask key
+//         });
+
+//         const result = await response.json();
+
+//         if (result.success) {
+//             closeFolderModal();
+//             location.reload(); // reload page to reflect changes
+//         } else {
+//             errorEl.innerText = result.error || "Something went wrong";
+//         }
+//     } catch (error) {
+//         errorEl.innerText = error;
+//     }
+// });
+// async function deleteFolder(folderName) {
+//     if (!folderName) {
+//         console.error("Folder name is required.");
+//         return;
+//     }
+
+//     try {
+//         const response = await fetch("/delete-folder", {
+//             method: "POST",
+//             headers: {
+//                 "Content-Type": "application/json"
+//             },
+//             body: JSON.stringify({ name: folderName })
+//         });
+
+//         const result = await response.json();
+
+//         if (response.ok) {
+//             window.location.reload()
+//         } else {
+//             console.error(result.error);
+//         }
+//     } catch (err) {
+//         console.error("Error deleting folder:", err);
+//     }
+// }
+
+
+
+</script>
+{% endblock %}

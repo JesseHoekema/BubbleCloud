@@ -1,0 +1,15 @@
+version: "3.9"
+
+services:
+  bubblecloud:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bubblecloud
+    ports:
+      - "5923:5923"
+    # volumes:
+    #  - ./YOUR_DIR_OUTSIDE_OF_CONTAINER:/app/app-files/files
+    environment:
+      - FLASK_ENV=production
+    restart: always
