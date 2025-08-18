@@ -24,7 +24,7 @@ services:
       - bubblecloud-data:/mount/files
     environment:
       - USER=admin;admin
-      - SHARE=bubblecloud;/mount/files;yes;no;no;test
+      - SHARE=bubblecloud;/mount/files;no;no;no;test
     restart: always
     network_mode: "host"
 
