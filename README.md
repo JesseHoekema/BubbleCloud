@@ -73,6 +73,10 @@ git clone https://github.com/JesseHoekema/BubbleCloud
 ```bash
 cd BubbleCloud
 ```
+4. In the docker compose file set the samba username and password like this
+```
+- USER=username;password
+```
 3. Run Docker Compose Command (make sure docker is running)
 ```bash
 docker compose up --build -d
