@@ -8,8 +8,25 @@ services:
     container_name: bubblecloud
     ports:
       - "5923:5923"
-    # volumes:
-    #  - ./YOUR_DIR_OUTSIDE_OF_CONTAINER:/app/app-files/files
+    volumes:
+      - bubblecloud-data:/app/app-files
     environment:
       - FLASK_ENV=production
     restart: always
+
+  samba:
+    image: dperson/samba
+    container_name: samba
+    ports:
+      - "139:139"
+      - "445:445"
+    volumes:
+      - bubblecloud-data:/mount/files
+    environment:
+      - USER=admin;admin
+      - SHARE=bubblecloud;/mount;yes;no;no;test;
+    restart: always
+    network_mode: "host"
+
+volumes:
+  bubblecloud-data:
