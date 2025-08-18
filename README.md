@@ -17,7 +17,7 @@
   <!-- <img alt="Github stars" src="https://img.shields.io/github/stars/{{YOUR_GITHUB_USERNAME}}/bubblecloud-new?color=56BEB8" /> -->
 </p>
 <p align="center">
-  A lightweight, self-hosted file storage solution powered by Docker.<br>
+  A lightweight, self-hosted file storage solution with samba/smb support powered by Docker.<br>
 </p>
 <p align="center">
   <a href="#about">About</a> &#xa0; | &#xa0; 
